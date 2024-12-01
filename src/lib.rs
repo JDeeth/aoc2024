@@ -1,4 +1,4 @@
-pub fn parse_col(input: &str, col: usize) -> Vec<u32> {
+fn parse_col(input: &str, col: usize) -> Vec<u32> {
     input
         .lines()
         .map(|line| {
@@ -19,6 +19,14 @@ pub fn sum_distance(input: &str) -> u32 {
     left.iter()
         .zip(right.iter())
         .map(|(a, b)| if a > b { a - b } else { b - a })
+        .sum()
+}
+
+pub fn similarity_score(input: &str) -> u32 {
+    let left = parse_col(input, 0);
+    let right = parse_col(input, 1);
+    left.iter()
+        .map(|a| a * right.iter().filter(|&b| a == b).count() as u32)
         .sum()
 }
 
@@ -52,5 +60,16 @@ mod tests {
     fn sum_distance_on_puzzle_input() {
         let input = fs::read_to_string("src/input.txt").unwrap();
         assert_eq!(sum_distance(&input), 1151792);
+    }
+
+    #[test]
+    fn similarity_score_on_test_values() {
+        assert_eq!(similarity_score(TEST_INPUT), 31);
+    }
+
+    #[test]
+    fn similarity_score_on_puzzle_input() {
+        let input = fs::read_to_string("src/input.txt").unwrap();
+        assert_eq!(similarity_score(&input), 21790168);
     }
 }
