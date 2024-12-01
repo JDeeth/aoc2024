@@ -58,7 +58,7 @@ mod tests {
 
     #[test]
     fn sum_distance_on_puzzle_input() {
-        let input = fs::read_to_string("src/input.txt").unwrap();
+        let input = fs::read_to_string("puzzle_input/01.txt").unwrap();
         assert_eq!(sum_distance(&input), 1151792);
     }
 
@@ -69,7 +69,7 @@ mod tests {
 
     #[test]
     fn similarity_score_on_puzzle_input() {
-        let input = fs::read_to_string("src/input.txt").unwrap();
+        let input = fs::read_to_string("puzzle_input/01.txt").unwrap();
         assert_eq!(similarity_score(&input), 21790168);
     }
 }
