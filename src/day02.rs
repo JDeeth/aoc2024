@@ -5,20 +5,20 @@ fn parse_report(report: &str) -> Vec<i32> {
         .collect()
 }
 
-fn valid_report(report: Vec<i32>) -> i32 {
+fn valid_report(report: Vec<i32>) -> bool {
     let intervals: Vec<_> = report
         .iter()
         .zip(report.iter().skip(1))
         .map(|(&a, &b)| b - a)
         .collect();
     match () {
-        _ if intervals.iter().all(|x| (1..=3).contains(x)) => 1,
-        _ if intervals.iter().all(|x| (-3..=-1).contains(x)) => 1,
-        _ => 0,
+        _ if intervals.iter().all(|x| (1..=3).contains(x)) => true,
+        _ if intervals.iter().all(|x| (-3..=-1).contains(x)) => true,
+        _ => false,
     }
 }
 
-pub fn validate(reports: &str) -> Vec<i32> {
+pub fn validate(reports: &str) -> Vec<bool> {
     reports
         .lines()
         .map(parse_report)
@@ -26,7 +26,7 @@ pub fn validate(reports: &str) -> Vec<i32> {
         .collect()
 }
 
-fn valid_with_tolerance(report: Vec<i32>) -> i32 {
+fn valid_with_tolerance(report: Vec<i32>) -> bool {
     for n in 0..report.len() {
         if valid_report(
             report
@@ -35,20 +35,23 @@ fn valid_with_tolerance(report: Vec<i32>) -> i32 {
                 .filter(|&(i, _)| i != n)
                 .map(|(_, &v)| v)
                 .collect(),
-        ) == 1
-        {
-            return 1;
+        ) {
+            return true;
         }
     }
-    0
+    false
 }
 
-pub fn validate_with_tolerance(reports: &str) -> Vec<i32> {
+pub fn validate_with_tolerance(reports: &str) -> Vec<bool> {
     reports
         .lines()
         .map(parse_report)
         .map(valid_with_tolerance)
         .collect()
+}
+
+pub fn count_true(v: Vec<bool>) -> usize {
+    v.iter().filter(|&x| *x).count()
 }
 
 #[cfg(test)]
@@ -67,23 +70,29 @@ mod tests {
 
     #[test]
     fn valid_report_on_test_input() {
-        assert_eq!(validate(TEST_INPUT), vec![1, 0, 0, 0, 0, 1]);
+        assert_eq!(
+            validate(TEST_INPUT),
+            vec![true, false, false, false, false, true]
+        );
     }
 
     #[test]
     fn count_valid_reports_in_puzzle_input() {
         let input = fs::read_to_string("puzzle_input/02.txt").unwrap();
-        assert_eq!(validate(&input).iter().sum::<i32>(), 202);
+        assert_eq!(count_true(validate(&input)), 202);
     }
 
     #[test]
     fn valid_report_on_test_input_with_tolerance() {
-        assert_eq!(validate_with_tolerance(TEST_INPUT), vec![1, 0, 0, 1, 1, 1]);
+        assert_eq!(
+            validate_with_tolerance(TEST_INPUT),
+            vec![true, false, false, true, true, true]
+        );
     }
 
     #[test]
     fn count_valid_reports_in_puzzle_input_with_tolerance() {
         let input = fs::read_to_string("puzzle_input/02.txt").unwrap();
-        assert_eq!(validate_with_tolerance(&input).iter().sum::<i32>(), 271);
+        assert_eq!(count_true(validate_with_tolerance(&input)), 271);
     }
 }
